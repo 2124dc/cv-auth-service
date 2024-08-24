@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class TestController {
-    @GetMapping("/ams/test")
+    @GetMapping("/auth/test")
     public String test() {
         return "Admin service is working!";
     }
