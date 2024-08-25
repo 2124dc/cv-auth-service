@@ -1,4 +1,4 @@
-package com.app.cv.serviceI;
+package com.app.cv.service;
 
 import com.app.cv.exception.NotFountException;
 import com.app.cv.model.Admin;
