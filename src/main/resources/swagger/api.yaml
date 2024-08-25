@@ -41,10 +41,53 @@ components:
         message:
           type: string
 
+    Admin:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        password:
+          type: string
+          example: "password123"
+        mobile:
+          type: string
+          example: "+1234567890"
+
 security:
   - bearerAuth: []
 
 paths:
+  /admin:
+    post:
+      summary: Add a new Admin
+      operationId: addAdmin
+      requestBody:
+        description: Admin object that needs to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Admin'
+      responses:
+        '201':
+          description: Admin created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '400':
+          description: Bad Request - Invalid input
+        '409':
+          description: Conflict - Admin already exists
+
   /login:
     post:
       summary: Authenticates user and returns a JWT token.
