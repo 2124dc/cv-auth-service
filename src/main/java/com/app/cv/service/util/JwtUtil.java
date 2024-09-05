@@ -11,18 +11,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import static io.jsonwebtoken.Jwts.*;
-
 @Component
 public class JwtUtil {
-
-    @Value("${jwt.secret}")
-    private String secret;
 
     @Value("${jwt.expiration}")
     private long expiration;
 
+    // Secure key for HS256 algorithm
     private SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String extractUsername(String token) {
@@ -36,7 +31,11 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         System.out.println("Extracting all claims from " + token);
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(key)  // Use the secure key instead of the string secret
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public Boolean isTokenExpired(String token) {
@@ -52,24 +51,13 @@ public class JwtUtil {
         return createToken(claims, userDetails.getUsername());
     }
 
-//    private String createToken(Map<String, Object> claims, String subject) {
-//        return builder()
-//                .setClaims(claims)
-//                .setSubject(subject)
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-//                .signWith(SignatureAlgorithm.HS256, secret)
-//                .compact();
-//    }
-
-
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))  // Use expiration from properties
+                .signWith(key, SignatureAlgorithm.HS256)  // Sign with the secure key
                 .compact();
     }
 

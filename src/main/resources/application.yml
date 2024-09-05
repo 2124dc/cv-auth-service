@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: cv-auth-service
+
+  cloud:
+    config:
+      uri: http://103.168.18.176:8061
+    profiles:
+      active: default
+    import: "optional:configserver:http://103.168.18.176:8061"
+
+  data:
+    mongodb:
+      uri: mongodb+srv://sharad-chavhan:sharad-chavdar-vishranti@chavdar-vishranti.t7dvk.mongodb.net/chavdar-vishranti?retryWrites=true&w=majority
+
+server:
+  port: 8063
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://103.168.18.176:8060/eureka/
+
+jwt:
+  secret: your-256-bit-base64-encoded-key
+  expiration: 3600000

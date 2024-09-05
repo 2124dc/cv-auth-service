@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +48,7 @@ public class AuthController {
         final UserDetails userDetails = authDetailsService.loadUserByUsername(authRequest.getEmail());
         final String token = jwtUtil.generateToken(userDetails);
 
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return new ResponseEntity<>("Bearer "+token, HttpStatus.OK);
     }
 
     @PostMapping("/auth/register")

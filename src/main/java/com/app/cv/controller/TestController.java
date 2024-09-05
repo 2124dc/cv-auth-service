@@ -13,6 +13,6 @@ public class TestController {
 
     @GetMapping("/auth/test")
     public String test() {
-        return "Admin service is working!";
+        return "Auth service is working!";
     }
 }

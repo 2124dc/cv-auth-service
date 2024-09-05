@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{dd MMM yyyy;HH:mm:ss.SSS} %yellow(TRACE_ID: %X{traceId}) [%t] %blue([%p]) %cyan(%X{requestId}) %yellow(LINE:%line) - %cyan(%C:%M) %m%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
