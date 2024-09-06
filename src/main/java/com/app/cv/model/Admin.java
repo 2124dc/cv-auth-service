@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore any unknown properties during JSON parsing.
 @Document(collection = "admin")
 public class
-AdminDto {
+Admin {
     @Id
     private String id;
     private String name;

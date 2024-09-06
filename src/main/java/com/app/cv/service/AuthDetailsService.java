@@ -1,7 +1,10 @@
 package com.app.cv.service;
 
 import com.app.cv.exception.UserAlreadyExistException;
-import com.app.cv.model.AdminDto;
+import com.app.cv.mapper.IAdminMapper;
+// import com.app.cv.mapper.IAdminMapper;
+import com.app.cv.model.Admin;
+import com.app.cv.model.AuthRegisterRequest;
 import com.app.cv.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,25 +22,20 @@ public class AuthDetailsService implements UserDetailsService {
     @Autowired
     private AdminRepository adminRepository;
 
+    @Autowired
+    IAdminMapper mapper;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<AdminDto> admin = adminRepository.findByEmail(email);
+        Optional<Admin> admin = adminRepository.findByEmail(email);
         if (admin.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
         return new org.springframework.security.core.userdetails.User(admin.get().getEmail(), admin.get().getPassword(), new ArrayList<>());
     }
 
-    public AdminDto saveAdmin(AdminDto adminDto, PasswordEncoder passwordEncoder) {
-        if (adminRepository.existsByEmail(adminDto.getEmail())) {
-            throw new UserAlreadyExistException("Email already exists. Please choose a different email.");
-        }
-
-        AdminDto admin = new AdminDto();
-        admin.setName(adminDto.getName());
-        admin.setEmail(adminDto.getEmail());
-        admin.setPassword(passwordEncoder.encode(adminDto.getPassword()));
-        admin.setMobile(adminDto.getMobile());
-        return adminRepository.save(admin);
+    public void saveAdmin(AuthRegisterRequest authRegisterRequest) {
+        Admin admin = mapper.mapAdminData(authRegisterRequest);
+        admin = adminRepository.save(admin);
     }
 }

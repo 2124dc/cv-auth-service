@@ -1,13 +1,62 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
-  title: Microservices API with JWT Authentication
-  description: API documentation for microservices using JWT authentication.
+  title: CV Auth Service API
+  description: API for Authentication Service that provides login functionality and returns JWT tokens.
   version: 1.0.0
-
+  contact:
+    name: Support Team
+    email: support@chavdarvishranti.com
 servers:
-  - url: http://localhost:8080
-    description: Local development server
+  - url: http://localhost:8063
+    description: Local server
+  - url: http://103.168.18.176:8063
+    description: Production server
 
+paths:
+  /auth/login:
+    post:
+      summary: Login and get JWT token
+      description: Authenticate the user with username and password, and return a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Unauthorized - invalid username or password
+        '400':
+          description: Bad request - invalid input format
+        '500':
+          description: Internal server error
+  /auth/register:
+    post:
+      summary: Register a new user
+      description: Register a new user with username, password, and email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRegisterRequest'
+            
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Bad request - invalid input format
+        '409':
+          description: Conflict - user already exists
+        '500':
+          description: Internal server error
+            
 components:
   securitySchemes:
     bearerAuth:
@@ -21,8 +70,10 @@ components:
       properties:
         username:
           type: string
+          example: "sharad@example.com"
         password:
           type: string
+          example: "password123"
       required:
         - username
         - password
@@ -32,83 +83,33 @@ components:
       properties:
         token:
           type: string
+          example: "eyJhbGciOiJIUzI1NiJ9..."
+      required:
+        - token
 
-    ErrorResponse:
+    AuthRegisterRequest:
       type: object
       properties:
-        status:
-          type: integer
-        message:
+        username:
           type: string
-
-    Admin:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "1"
-        name:
-          type: string
-          example: "John Doe"
-        email:
-          type: string
-          format: email
-          example: "john.doe@example.com"
+          example: "sharad@example.com"
         password:
           type: string
           example: "password123"
+        name:
+          type: string
+          example: "sharad"
         mobile:
           type: string
-          example: "+1234567890"
+          example: "0987654321"
+        
+      required:
+        - username
+        - password
 
 security:
   - bearerAuth: []
 
-paths:
-  /admin:
-    post:
-      summary: Add a new Admin
-      operationId: addAdmin
-      requestBody:
-        description: Admin object that needs to be added to the system
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Admin'
-      responses:
-        '201':
-          description: Admin created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Admin'
-        '400':
-          description: Bad Request - Invalid input
-        '409':
-          description: Conflict - Admin already exists
-
-  /login:
-    post:
-      summary: Authenticates user and returns a JWT token.
-      operationId: loginUser
-      requestBody:
-        description: User credentials
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthRequest'
-      responses:
-        '200':
-          description: Successful authentication
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+tags:
+  - name: Auth
+    description: Authentication related endpoints
