@@ -34,8 +34,10 @@ public class AuthDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(admin.get().getEmail(), admin.get().getPassword(), new ArrayList<>());
     }
 
-    public void saveAdmin(AuthRegisterRequest authRegisterRequest) {
+    public void saveAdmin(AuthRegisterRequest authRegisterRequest, PasswordEncoder passwordEncoder) {
         Admin admin = mapper.mapAdminData(authRegisterRequest);
+        System.out.println("Admin : ---->> "+admin.toString());
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin = adminRepository.save(admin);
     }
 }

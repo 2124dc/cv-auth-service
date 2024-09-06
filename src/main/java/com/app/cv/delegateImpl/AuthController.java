@@ -57,11 +57,10 @@ public class AuthController implements AuthApiDelegate{
     @Override
     public ResponseEntity<Void> authRegisterPost(AuthRegisterRequest authRegisterRequest) {
         System.out.println("AuthController -> authRegisterPost");
-        authDetailsService.saveAdmin(authRegisterRequest);
+        authDetailsService.saveAdmin(authRegisterRequest, passwordEncoder);
         return new ResponseEntity<Void>(HttpStatus.OK);
         
     }
-
 
 
 }

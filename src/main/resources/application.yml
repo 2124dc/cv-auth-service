@@ -4,22 +4,13 @@ spring:
 
   cloud:
     config:
-      uri: http://103.168.18.176:8061
-    profiles:
-      active: default
-    import: "optional:configserver:http://103.168.18.176:8061"
+      uri: http://localhost:8061
 
-  data:
-    mongodb:
-      uri: mongodb+srv://sharad-chavhan:sharad-chavdar-vishranti@chavdar-vishranti.t7dvk.mongodb.net/chavdar-vishranti?retryWrites=true&w=majority
+  profiles:
+    active: default
 
-server:
-  port: 8063
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://103.168.18.176:8060/eureka/
+  config:
+    import: optional:configserver:${spring.cloud.config.uri}
 
 jwt:
   secret: your-256-bit-base64-encoded-key
