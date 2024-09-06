@@ -7,10 +7,10 @@ info:
     name: Support Team
     email: support@chavdarvishranti.com
 servers:
-  - url: http://localhost:8063
+  - url: http://localhost:8063/cv-auth
     description: Local server
-  - url: http://103.168.18.176:8063
-    description: Production server
+  # - url: http://103.168.18.176:8063
+  #   description: Production server
 
 paths:
   /auth/login:

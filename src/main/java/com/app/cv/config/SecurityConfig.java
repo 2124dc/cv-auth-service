@@ -37,7 +37,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/auth/login", "/auth/register").permitAll()
+                    .requestMatchers("/cv-auth/auth/login", "/cv-auth/auth/register").permitAll()
                     .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtRequestFilter(jwtUtil, authDetailsService), UsernamePasswordAuthenticationFilter.class);

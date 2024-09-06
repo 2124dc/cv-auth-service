@@ -35,6 +35,10 @@ public class AuthDetailsService implements UserDetailsService {
     }
 
     public void saveAdmin(AuthRegisterRequest authRegisterRequest, PasswordEncoder passwordEncoder) {
+
+        if (adminRepository.existsByEmail(authRegisterRequest.getUsername())) {
+            throw new UserAlreadyExistException("Email already exists. Please choose a different email.");
+        }
         Admin admin = mapper.mapAdminData(authRegisterRequest);
         System.out.println("Admin : ---->> "+admin.toString());
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
