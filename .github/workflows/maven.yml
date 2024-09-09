@@ -103,7 +103,7 @@ jobs:
       run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "$REMOTE_DIR/scripts/stop_service.sh ${{ env.JAR_NAME }}" || true
 
     - name: Start new service on VPS
-      run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "nohup java -jar $REMOTE_DIR/jars/$REPO_NAME/${{ env.JAR_NAME }} > $REMOTE_DIR/jars/$REPO_NAME/$REPO_NAME.log 2>&1 &"
+      run: ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "nohup java -jar $REMOTE_DIR/jars/$REPO_NAME/${{ env.JAR_NAME }} --spring.profiles.active=prod > $REMOTE_DIR/jars/$REPO_NAME/$REPO_NAME.log 2>&1 &"
 
     - name: Confirm Service Start
       run: echo "New service started successfully on VPS."
