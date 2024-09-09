@@ -2,12 +2,40 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "prod" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "prod" ]
 
 jobs:
-  build:
+  pull_request_steps:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Checkout code
+      run: echo "Code checkout completed successfully."
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Confirm JDK Setup
+      run: echo "JDK 21 setup completed successfully."
+
+    - name: Build with Maven and Extract JAR Name
+      id: build
+      run: |
+        mvn -B package --file pom.xml
+        JAR_NAME=$(ls target/*.jar | xargs -n 1 basename)
+        echo "JAR_NAME=$JAR_NAME" >> $GITHUB_ENV
+        echo "Maven build completed successfully and JAR_NAME is $JAR_NAME."
+
+  merge_steps:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/prod'
     runs-on: ubuntu-latest
 
     env:
@@ -45,13 +73,6 @@ jobs:
         REPO_NAME=$(basename $GITHUB_REPOSITORY)
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
         echo "Repository name is $REPO_NAME."
-
-    # - name: Set Remote Directory
-    #   id: remote_dir
-    #   run: |
-    #     REMOTE_DIR="${{ env.REMOTE_BASE_DIR }}/jars/$REPO_NAME"
-    #     echo "REMOTE_DIR=$REMOTE_DIR" >> $GITHUB_ENV
-    #     echo "Remote directory set to $REMOTE_DIR."
 
     - name: Generate Git Build Info File
       run: |
