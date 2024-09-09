@@ -5,7 +5,6 @@ spring:
   cloud:
     config:
       uri: http://103.168.18.176:8061
-      # uri: http://localhost:8061
 
   profiles:
     active: default
