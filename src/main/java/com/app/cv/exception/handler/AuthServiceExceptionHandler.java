@@ -14,8 +14,8 @@ import org.springframework.web.context.request.WebRequest;
 public class AuthServiceExceptionHandler {
 
     @ExceptionHandler(InvalidUserException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(InvalidUserException ex, WebRequest request) {
-        System.out.println("AuthServiceExceptionHandler-> handleNotFoundException ");
+    public ResponseEntity<ErrorResponse> handleInvalidUserException(InvalidUserException ex, WebRequest request) {
+        System.out.println("AuthServiceExceptionHandler-> handleInvalidUserException ");
         ErrorResponse errorResponse = new ErrorResponse(ex.getErrorCode(), ex.getMessage());
         System.out.println("111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
