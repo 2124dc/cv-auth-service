@@ -1,21 +1,3 @@
 spring:
   application:
     name: cv-auth-service
-
-  cloud:
-    config:
-      uri: http://103.168.18.176:8061
-
-  profiles:
-    active: default
-
-  config:
-    import: optional:configserver:${spring.cloud.config.uri}
-
-jwt:
-  secret: your-256-bit-base64-encoded-key
-  expiration: 3600000
-
-logging:
-  level:
-    root: ERROR

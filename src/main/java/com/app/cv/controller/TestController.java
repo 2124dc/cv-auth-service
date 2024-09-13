@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @GetMapping("/auth/self")
+    @GetMapping("/cv-auth/test")
     public String test() {
         return "Auth Service is working!";
     }
