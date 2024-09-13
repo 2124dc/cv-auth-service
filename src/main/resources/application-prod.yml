@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      uri: http://103.168.18.176:8061
+
+  config:
+    import: optional:configserver:${spring.cloud.config.uri}
