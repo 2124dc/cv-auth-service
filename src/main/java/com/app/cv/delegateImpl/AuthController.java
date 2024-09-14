@@ -2,6 +2,8 @@ package com.app.cv.delegateImpl;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.cv.api.AuthApiDelegate;
+import com.app.cv.common.Common;
 import com.app.cv.exception.InvalidUserException;
 import com.app.cv.model.AuthRegisterRequest;
 import com.app.cv.model.AuthRequest;
 import com.app.cv.model.AuthResponse;
+import com.app.cv.model.SuccessResponse;
 import com.app.cv.service.AuthDetailsService;
 import com.app.cv.service.util.JwtUtil;
 
@@ -35,30 +39,30 @@ public class AuthController implements AuthApiDelegate{
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Override
-    public ResponseEntity<AuthResponse> authLoginPost(@Valid AuthRequest authRequest) {
-        System.out.println("Authenticating user: " + authRequest);
+    public ResponseEntity<SuccessResponse> authLoginPost(@Valid AuthRequest authRequest) {
+        logger.info("AuthController -> authLoginPost : {}", authRequest);
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
         } catch (AuthenticationException e) {
+            logger.error("Invalid Username or password ... : {}", authRequest);
             throw new InvalidUserException("Invalid Username or password ...");
         }
 
         final UserDetails userDetails = authDetailsService.loadUserByUsername(authRequest.getUsername());
         final String token = jwtUtil.generateToken(userDetails);
-        // Create AuthResponse and set the token
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setToken("Bearer "+token);  // Assuming AuthResponse has a setter method for 'token'
-        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
+        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", token), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> authRegisterPost(AuthRegisterRequest authRegisterRequest) {
-        System.out.println("AuthController -> authRegisterPost");
+    public ResponseEntity<SuccessResponse> authRegisterPost(AuthRegisterRequest authRegisterRequest) {
+        logger.info("AuthController -> authRegisterPost : {}", authRegisterRequest);
         authDetailsService.saveAdmin(authRegisterRequest, passwordEncoder);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", null), HttpStatus.OK);
         
     }
 
