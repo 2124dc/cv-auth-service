@@ -1,11 +1,11 @@
 package com.app.cv.service;
 
-import com.app.cv.delegateImpl.AuthController;
 import com.app.cv.exception.UserAlreadyExistException;
 import com.app.cv.mapper.IAdminMapper;
-// import com.app.cv.mapper.IAdminMapper;
 import com.app.cv.model.Admin;
+import com.app.cv.model.AdminCreds;
 import com.app.cv.model.AuthRegisterRequest;
+import com.app.cv.repository.AdminCredsRepository;
 import com.app.cv.repository.AdminRepository;
 
 import org.slf4j.Logger;
@@ -27,6 +27,9 @@ public class AuthDetailsService implements UserDetailsService {
     private AdminRepository adminRepository;
 
     @Autowired
+    private AdminCredsRepository adminCredsRepository;
+
+    @Autowired
     IAdminMapper mapper;
 
     // Create a logger instance for the class
@@ -35,7 +38,7 @@ public class AuthDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         logger.info("AuthDetailsService -> loadUserByUsername : {}", email);
-        Optional<Admin> admin = adminRepository.findByEmail(email);
+        Optional<AdminCreds> admin = adminCredsRepository.findByEmail(email);
         if (admin.isEmpty()) {
             logger.error("AuthDetailsService -> saveAdmin -> isEmpty: {}", admin.isEmpty());
             throw new UsernameNotFoundException("User not found");
@@ -45,13 +48,16 @@ public class AuthDetailsService implements UserDetailsService {
 
     public Admin saveAdmin(AuthRegisterRequest authRegisterRequest, PasswordEncoder passwordEncoder) {
         logger.info("AuthDetailsService -> saveAdmin : {}", authRegisterRequest);
-        if (adminRepository.existsByEmail(authRegisterRequest.getUsername())) {
+        if (adminCredsRepository.existsByEmail(authRegisterRequest.getUsername())) {
             logger.error("AuthDetailsService -> saveAdmin -> existsByEmail: {}", authRegisterRequest.getUsername());
             throw new UserAlreadyExistException("Email already exists. Please choose a different email.");
         }
+
+        AdminCreds adminCred = mapper.mapAdminCredsData(authRegisterRequest);
+        adminCred.setPassword(passwordEncoder.encode(adminCred.getPassword()));
+        adminCredsRepository.save(adminCred);
+        logger.info("Credentials saved Successfully...for  : {}", adminCred.getEmail());
         Admin admin = mapper.mapAdminData(authRegisterRequest);
-        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
-        admin = adminRepository.save(admin);
-        return admin;
+        return adminRepository.save(admin);
     }
 }

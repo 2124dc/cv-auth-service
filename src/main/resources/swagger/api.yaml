@@ -136,9 +136,16 @@ components:
         mobile:
           type: string
           example: "0987654321"
+        userRole:
+          type: string
+          enum:
+            - ADMIN
+            - OWNER
+          example: ADMIN
       required:
         - username
         - password
+        - userRole
 
     SuccessResponse:
       type: object

@@ -15,8 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.cv.api.AuthApiDelegate;
-import com.app.cv.common.Common;
+import com.app.cv.common.classes.Common;
 import com.app.cv.exception.InvalidUserException;
+import com.app.cv.model.Admin;
 import com.app.cv.model.AuthRegisterRequest;
 import com.app.cv.model.AuthRequest;
 import com.app.cv.model.AuthResponse;
@@ -61,10 +62,7 @@ public class AuthController implements AuthApiDelegate{
     @Override
     public ResponseEntity<SuccessResponse> authRegisterPost(AuthRegisterRequest authRegisterRequest) {
         logger.info("AuthController -> authRegisterPost : {}", authRegisterRequest);
-        authDetailsService.saveAdmin(authRegisterRequest, passwordEncoder);
-        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", null), HttpStatus.OK);
-        
+        Admin admin = authDetailsService.saveAdmin(authRegisterRequest, passwordEncoder);
+        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", admin), HttpStatus.OK);
     }
-
-
 }
