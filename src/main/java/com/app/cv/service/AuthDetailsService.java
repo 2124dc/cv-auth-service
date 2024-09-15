@@ -1,10 +1,12 @@
 package com.app.cv.service;
 
+import com.app.cv.common.feigninteface.AdminServiceFeignClient;
 import com.app.cv.exception.UserAlreadyExistException;
 import com.app.cv.mapper.IAdminMapper;
 import com.app.cv.model.Admin;
 import com.app.cv.model.AdminCreds;
 import com.app.cv.model.AuthRegisterRequest;
+import com.app.cv.model.SuccessResponse;
 import com.app.cv.repository.AdminCredsRepository;
 import com.app.cv.repository.AdminRepository;
 
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,12 @@ public class AuthDetailsService implements UserDetailsService {
     @Autowired
     IAdminMapper mapper;
 
+    private final AdminServiceFeignClient adminServiceFeignClient;
+
+    @Autowired
+    public AuthDetailsService(AdminServiceFeignClient adminServiceFeignClient) {
+        this.adminServiceFeignClient = adminServiceFeignClient;
+    }
     // Create a logger instance for the class
     private static final Logger logger = LoggerFactory.getLogger(AuthDetailsService.class);
 
@@ -46,7 +55,7 @@ public class AuthDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(admin.get().getEmail(), admin.get().getPassword(), new ArrayList<>());
     }
 
-    public Admin saveAdmin(AuthRegisterRequest authRegisterRequest, PasswordEncoder passwordEncoder) {
+    public AdminCreds saveAdmin(AuthRegisterRequest authRegisterRequest, BCryptPasswordEncoder passwordEncoder) {
         logger.info("AuthDetailsService -> saveAdmin : {}", authRegisterRequest);
         if (adminCredsRepository.existsByEmail(authRegisterRequest.getUsername())) {
             logger.error("AuthDetailsService -> saveAdmin -> existsByEmail: {}", authRegisterRequest.getUsername());
@@ -55,9 +64,8 @@ public class AuthDetailsService implements UserDetailsService {
 
         AdminCreds adminCred = mapper.mapAdminCredsData(authRegisterRequest);
         adminCred.setPassword(passwordEncoder.encode(adminCred.getPassword()));
-        adminCredsRepository.save(adminCred);
+        adminCred = adminCredsRepository.save(adminCred);
         logger.info("Credentials saved Successfully...for  : {}", adminCred.getEmail());
-        Admin admin = mapper.mapAdminData(authRegisterRequest);
-        return adminRepository.save(admin);
+        return adminCred;
     }
 }

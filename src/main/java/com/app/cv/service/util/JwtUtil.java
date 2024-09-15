@@ -65,4 +65,14 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    // Overloaded validateToken method used for checking validity without username
+    public Boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);  // If token parsing fails, the token is invalid
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
