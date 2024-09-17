@@ -1,4 +1,3 @@
-
 package com.app.cv.delegateImpl;
 
 import javax.validation.Valid;
@@ -13,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.cv.api.AuthApiDelegate;
@@ -24,12 +24,10 @@ import com.app.cv.service.AdminService;
 import com.app.cv.service.OwnerService;
 import com.app.cv.service.util.JwtUtil;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 @RestController
-public class AuthController implements AuthApiDelegate{
+public class AuthController implements AuthApiDelegate {
 
-     @Autowired
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -37,12 +35,12 @@ public class AuthController implements AuthApiDelegate{
 
     @Autowired
     private AdminService adminService;
+
     @Autowired
     private OwnerService ownerService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    // JWT validation endpoint
     @PostMapping("/validate-token")
     public ResponseEntity<Boolean> validateToken(@RequestBody String token) {
         boolean isValid = jwtUtil.validateToken(token);
@@ -50,8 +48,9 @@ public class AuthController implements AuthApiDelegate{
     }
 
     @Override
-    public ResponseEntity<SuccessResponse> login(@Valid AuthRequest authRequest) {
-        logger.info("AuthController -> authLoginPost : {}", authRequest);
+    public ResponseEntity<SuccessResponse> login(@Valid @RequestBody AuthRequest authRequest) {
+        logger.info("AuthController -> login : {}", authRequest);
+        UserDetails userDetails = null;
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
@@ -61,12 +60,21 @@ public class AuthController implements AuthApiDelegate{
             throw new InvalidUserException("Invalid Username or password ...");
         }
 
-        UserDetails userDetails = adminService.loadUserByUsername(authRequest.getUsername());
-        System.out.println("********************************* : "+ userDetails.toString());
-        if(userDetails.getPassword() == null || userDetails.getPassword().equals("")){
-            userDetails = ownerService.loadUserByUsername(authRequest.getUsername());
+        // Attempt to load user as Admin
+        try {
+            userDetails = adminService.loadUserByUsername(authRequest.getUsername());
+        } catch (Exception e) {
+            // If loading as Admin fails, try loading as Owner
+            logger.info("Admin authentication failed, trying Owner authentication");
+            try {
+                userDetails = ownerService.loadUserByUsername(authRequest.getUsername());
+            } catch (Exception ex) {
+                logger.error("User not found in both Admin and Owner services");
+                throw new InvalidUserException("User not found");
+            }
         }
+
         final String token = jwtUtil.generateToken(userDetails);
-        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", token), HttpStatus.OK);
+        return new ResponseEntity<>(Common.getSuccessResponse("Operation Successful", token), HttpStatus.OK);
     }
 }

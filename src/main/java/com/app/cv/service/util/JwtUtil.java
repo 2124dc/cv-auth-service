@@ -75,4 +75,14 @@ public class JwtUtil {
             return false;
         }
     }
+
+    public boolean isAdminToken(String token) {
+        String role = extractClaim(token, Claims::getSubject); // Assuming you store role in the JWT
+        return "ADMIN".equalsIgnoreCase(role);
+    }
+    
+    public boolean isOwnerToken(String token) {
+        String role = extractClaim(token, Claims::getSubject); // Assuming you store role in the JWT
+        return "OWNER".equalsIgnoreCase(role);
+    }
 }
