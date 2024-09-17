@@ -17,6 +17,7 @@ paths:
     post:
       summary: Login and get JWT token
       description: Authenticate the user with username and password, and return a JWT token.
+      operationId: login
       requestBody:
         required: true
         content:
@@ -49,16 +50,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/register:
+  /admin/register:
     post:
       summary: Register a new user
       description: Register a new user with username, password, and email.
+      operationId: registerAdmin
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthRegisterRequest'
+              $ref: '#/components/schemas/AdminRegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Bad request - invalid input format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Conflict - user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /owner/register:
+    post:
+      summary: Register a new user
+      description: Register a new user with username, password, and email.
+      operationId: registerOwner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerRegisterRequest'
       responses:
         '201':
           description: User registered successfully
@@ -99,6 +143,13 @@ components:
       bearerFormat: JWT
 
   schemas:
+    UserRoleEnum:
+      type: string
+      enum:
+        - ADMIN
+        - OWNER
+      example: ADMIN
+
     AuthRequest:
       type: object
       properties:
@@ -121,7 +172,7 @@ components:
       required:
         - token
 
-    AuthRegisterRequest:
+    AdminRegisterRequest:
       type: object
       properties:
         username:
@@ -137,11 +188,29 @@ components:
           type: string
           example: "0987654321"
         userRole:
+          $ref: '#/components/schemas/UserRoleEnum'
+      required:
+        - username
+        - password
+        - userRole
+
+    OwnerRegisterRequest:
+      type: object
+      properties:
+        username:
           type: string
-          enum:
-            - ADMIN
-            - OWNER
-          example: ADMIN
+          example: "sharad@example.com"
+        password:
+          type: string
+          example: "password123"
+        name:
+          type: string
+          example: "sharad"
+        mobile:
+          type: string
+          example: "0987654321"
+        userRole:
+          $ref: '#/components/schemas/UserRoleEnum'
       required:
         - username
         - password

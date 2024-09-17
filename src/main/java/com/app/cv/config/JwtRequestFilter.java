@@ -1,5 +1,6 @@
 package com.app.cv.config;
-import com.app.cv.service.AuthDetailsService;
+import com.app.cv.service.AdminService;
+import com.app.cv.service.OwnerService;
 import com.app.cv.service.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,11 +15,11 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final AuthDetailsService authDetailsService;
+    private final AdminService adminService;
 
-    public JwtRequestFilter(JwtUtil jwtUtil,  AuthDetailsService authDetailsService) {
+    public JwtRequestFilter(JwtUtil jwtUtil,  AdminService adminService) {
         this.jwtUtil = jwtUtil;
-        this.authDetailsService = authDetailsService;
+        this.adminService = adminService;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = authDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = adminService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =

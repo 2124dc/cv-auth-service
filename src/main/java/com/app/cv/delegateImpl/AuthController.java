@@ -1,3 +1,4 @@
+
 package com.app.cv.delegateImpl;
 
 import javax.validation.Valid;
@@ -11,21 +12,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.cv.api.AuthApiDelegate;
 import com.app.cv.common.classes.Common;
-import com.app.cv.common.feigninteface.AdminServiceFeignClient;
 import com.app.cv.exception.InvalidUserException;
-import com.app.cv.model.Admin;
-import com.app.cv.model.AdminCreds;
-import com.app.cv.model.AuthRegisterRequest;
 import com.app.cv.model.AuthRequest;
-import com.app.cv.model.AuthResponse;
 import com.app.cv.model.SuccessResponse;
-import com.app.cv.service.AuthDetailsService;
+import com.app.cv.service.AdminService;
+import com.app.cv.service.OwnerService;
 import com.app.cv.service.util.JwtUtil;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -40,13 +36,9 @@ public class AuthController implements AuthApiDelegate{
     private JwtUtil jwtUtil;
 
     @Autowired
-    private AuthDetailsService authDetailsService;
-
+    private AdminService adminService;
     @Autowired
-    BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    AdminServiceFeignClient adminServiceFeignClient;
+    private OwnerService ownerService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -58,7 +50,7 @@ public class AuthController implements AuthApiDelegate{
     }
 
     @Override
-    public ResponseEntity<SuccessResponse> authLoginPost(@Valid AuthRequest authRequest) {
+    public ResponseEntity<SuccessResponse> login(@Valid AuthRequest authRequest) {
         logger.info("AuthController -> authLoginPost : {}", authRequest);
         try {
             authenticationManager.authenticate(
@@ -69,18 +61,12 @@ public class AuthController implements AuthApiDelegate{
             throw new InvalidUserException("Invalid Username or password ...");
         }
 
-        final UserDetails userDetails = authDetailsService.loadUserByUsername(authRequest.getUsername());
+        UserDetails userDetails = adminService.loadUserByUsername(authRequest.getUsername());
+        System.out.println("********************************* : "+ userDetails.toString());
+        if(userDetails.getPassword() == null || userDetails.getPassword().equals("")){
+            userDetails = ownerService.loadUserByUsername(authRequest.getUsername());
+        }
         final String token = jwtUtil.generateToken(userDetails);
         return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", token), HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<SuccessResponse> authRegisterPost(AuthRegisterRequest authRegisterRequest) {
-        logger.info("AuthController -> authRegisterPost : {}", authRegisterRequest);
-        AdminCreds adminCreds = authDetailsService.saveAdmin(authRegisterRequest, passwordEncoder);
-        if (adminCreds.getId() != null) {
-            return new ResponseEntity<>(Common.getSuccessResponse("Operation Successfull", adminServiceFeignClient.registerOwner(authRegisterRequest).getData()), HttpStatus.OK);
-        }   
-        throw new InvalidUserException("Something went wrong....");
     }
 }

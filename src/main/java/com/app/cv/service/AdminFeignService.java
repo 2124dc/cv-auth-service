@@ -1,7 +1,7 @@
 package com.app.cv.service;
 
 import com.app.cv.common.feigninteface.AdminServiceFeignClient;
-import com.app.cv.model.AuthRegisterRequest;
+import com.app.cv.model.AdminRegisterRequest;
 import com.app.cv.model.SuccessResponse;
 
 import org.slf4j.Logger;
@@ -17,11 +17,11 @@ public class AdminFeignService  {
     public AdminFeignService(AdminServiceFeignClient adminServiceFeignClient) {
         this.adminServiceFeignClient = adminServiceFeignClient;
     }
-    private static final Logger logger = LoggerFactory.getLogger(AuthDetailsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
-    public SuccessResponse saveAdmin(AuthRegisterRequest authRegisterRequest) {
-        logger.info("AuthDetailsService -> saveAdmin : {}", authRegisterRequest.getUsername());
-        return adminServiceFeignClient.registerOwner(authRegisterRequest);
+    public SuccessResponse saveAdmin(AdminRegisterRequest adminRegisterRequest) {
+        logger.info("AuthDetailsService -> saveAdmin : {}", adminRegisterRequest.getUsername());
+        return adminServiceFeignClient.registerAdmin(adminRegisterRequest);
     }
 
 }

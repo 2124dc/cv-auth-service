@@ -1,6 +1,7 @@
 package com.app.cv.config;
 
-import com.app.cv.service.AuthDetailsService;
+import com.app.cv.service.AdminService;
+import com.app.cv.service.OwnerService;
 import com.app.cv.service.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +22,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 public class SecurityConfig {
 
     @Autowired
-    private AuthDetailsService authDetailsService;
+    private AdminService adminService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -37,10 +38,10 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/cv-auth/auth/login", "/cv-auth/auth/register").permitAll()
+                    .requestMatchers("/cv-auth/auth/login", "/cv-auth/admin/register").permitAll()
                     .anyRequest().authenticated()
             )
-            .addFilterBefore(new JwtRequestFilter(jwtUtil, authDetailsService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtRequestFilter(jwtUtil, adminService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -48,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(authDetailsService);
+        authenticationProvider.setUserDetailsService(adminService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return new ProviderManager(authenticationProvider);
@@ -61,6 +62,6 @@ public class SecurityConfig {
 
     @Bean
     public JwtRequestFilter jwtRequestFilter() {
-        return new JwtRequestFilter(jwtUtil, authDetailsService);
+        return new JwtRequestFilter(jwtUtil, adminService);
     }
 }
