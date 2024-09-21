@@ -5,3 +5,6 @@ spring:
 
   config:
     import: optional:configserver:${spring.cloud.config.uri}
+
+ADMIN_SERVICE_URL: http://localhost:8071
+OWNER_SERVICE_URL: http://localhost:8072

@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString(exclude = "id") // Exclude id field from toString output for better readability.
 @EqualsAndHashCode(exclude = "id") // Exclude id field from equals and hashCode methods for better performance.
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore any unknown properties during JSON parsing.
-@Document(collection = "admin")
-public class Admin {
+@Document(collection = "owner")
+public class Owner {
     @Id
     private String id;
     private String email;

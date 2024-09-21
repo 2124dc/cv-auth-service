@@ -6,23 +6,23 @@ import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import com.app.cv.common.classes.UserRole;
-import com.app.cv.model.Admin;
-import com.app.cv.model.AdminCreds;
-import com.app.cv.model.AdminRegisterRequest;
+import com.app.cv.model.Owner;
+import com.app.cv.model.OwnerCreds;
+import com.app.cv.model.OwnerRegisterRequest;
 import com.app.cv.model.UserRoleEnum;
 
 @Mapper(componentModel = "spring")
 @Component
-public interface IAdminMapper {
+public interface IOwnerMapper {
 
     @Mapping(source = "username", target = "email")
     @Mapping(source = "password", target = "password")
-    AdminCreds mapAdminCredsData(AdminRegisterRequest adminRegisterRequest);
+    OwnerCreds mapOwnerCredsData(OwnerRegisterRequest ownerRegisterRequest);
 
     @Mapping(source = "username", target = "email")
     @Mapping(source = "mobile", target = "mobile")
     @Mapping(source = "userRole", target = "userRole", qualifiedByName = "mapUserRoleEnum")
-    Admin mapAdminData(AdminRegisterRequest adminRegisterRequest);
+    Owner mapOwnerData(OwnerRegisterRequest ownerRegisterRequest);
 
     @Named("mapUserRoleEnum")
     default UserRole mapUserRoleEnum(UserRoleEnum userRoleEnum) {

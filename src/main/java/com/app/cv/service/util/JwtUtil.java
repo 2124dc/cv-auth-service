@@ -65,4 +65,24 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    // Overloaded validateToken method used for checking validity without username
+    public Boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);  // If token parsing fails, the token is invalid
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isAdminToken(String token) {
+        String role = extractClaim(token, Claims::getSubject); // Assuming you store role in the JWT
+        return "ADMIN".equalsIgnoreCase(role);
+    }
+    
+    public boolean isOwnerToken(String token) {
+        String role = extractClaim(token, Claims::getSubject); // Assuming you store role in the JWT
+        return "OWNER".equalsIgnoreCase(role);
+    }
 }
